@@ -11,6 +11,10 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ]
+    ],
+    "rewrites": [{
+      "source": "/api/v1/**",
+      "function": "personalDataApi"
+    }]
   }
 }
