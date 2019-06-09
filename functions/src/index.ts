@@ -85,6 +85,48 @@ export const personalDataApi = functions.https.onRequest(main);
  });
 
  /**
+  * Metodo para actualizar los datos personales de un paciente existente
+  */
+app.patch('/paciente/personal/:pacienteId', (req, res) => {
+    firebaseHelper.firestore
+        .checkDocumentExists(
+            db,
+            personalDataCollection,
+            req.params.pacienteId
+        )
+        .then((document:any) => {
+            if(document.exists) {
+                firebaseHelper.firestore
+                    .updateDocument(
+                        db,
+                        personalDataCollection,
+                        req.params.pacienteId,
+                        req.body
+                    )
+                    .then((success:any) => {
+                        res.send({
+                            status:'success',
+                            messsage: 'Se han actualizado los datos con exito'
+                        });
+                    })
+                    .catch((error:any) => {
+                        res.send({
+                            status: 'error', 
+                            message: 'Existió un error al intentar actualizar los datos'
+                        });
+                    });
+            } else {
+                res
+                    .status(404)
+                    .send({
+                        status: 'error',
+                        message: 'No existe el paciente'
+                    });
+            }
+        });
+});
+
+ /**
   * Metodo para conseguir los datos de un paciente determinado
   */
  app.get('/paciente/personal/:pacienteId', (req, res) => {
@@ -105,6 +147,48 @@ export const personalDataApi = functions.https.onRequest(main);
                     .send({
                         status: 'error',
                         message: 'El paciente aún no tiene datos personales'
+                    });
+            }
+        });
+ });
+
+ /**
+  * Metodo para eliminar los datos personales de un paciente existente
+  */
+ app.delete('/paciente/personal/:pacienteId', (req, res) => {
+     firebaseHelper.firestore
+        .checkDocumentExists(
+            db,
+            personalDataCollection,
+            req.params.pacienteId
+        )
+        .then((document:any) =>{
+            if(document.exists) {
+                firebaseHelper.firestore
+                    .deleteDocument(
+                        db,
+                        personalDataCollection,
+                        req.params.pacienteId
+                    )
+                    .then((success:any) => {
+                        if(success.status) {
+                            res.send({
+                                status: 'success',
+                                message: 'Se han reseteado tus datos personales'
+                            });
+                        } else {
+                            res.send({
+                                status: 'error',
+                                message: 'Existió un error al intentar resetear tus datos personales'
+                            });
+                        }
+                    });
+            } else {
+                res
+                    .status(404)
+                    .send({
+                        status: 'error',
+                        message: 'No existe el paciente'
                     });
             }
         });
